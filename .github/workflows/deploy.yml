@@ -31,6 +31,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           # Se o repo se chamar diferente de "taskflow-app", troque abaixo
           # (ou apague a linha se este repo for uma página raiz usuario.github.io).
           VITE_BASE_PATH: /${{ github.event.repository.name }}/

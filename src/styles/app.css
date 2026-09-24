@@ -288,6 +288,19 @@
   margin-bottom: 14px;
 }
 
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.settings-toggle input {
+  width: auto;
+}
+
 /* ---------- kanban ---------- */
 
 .kanban-board {
@@ -576,6 +589,30 @@
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.agenda-row-event {
+  text-decoration: none;
+  color: inherit;
+}
+
+.agenda-row-event:hover {
+  border-color: var(--accent);
+}
+
+.agenda-google-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border-radius: 4px;
+  background: #4285f4;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: -3px;
 }
 
 .status-dot {

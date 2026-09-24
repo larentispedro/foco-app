@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useTimer } from "../contexts/TimerContext";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  notificationsSupported,
+  requestNotificationPermission,
+} from "../lib/notify";
 
 export default function Settings() {
   const { settings, updateSettings, isRunning } = useTimer();
@@ -8,6 +12,7 @@ export default function Settings() {
   const [focusMinutes, setFocusMinutes] = useState(settings.focusMinutes);
   const [breakMinutes, setBreakMinutes] = useState(settings.breakMinutes);
   const [saved, setSaved] = useState(false);
+  const [notifyError, setNotifyError] = useState("");
 
   function handleSave(e) {
     e.preventDefault();
@@ -17,6 +22,25 @@ export default function Settings() {
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
+  }
+
+  async function handleToggleNotify(e) {
+    const checked = e.target.checked;
+    setNotifyError("");
+    if (!checked) {
+      updateSettings({ notifyEnabled: false });
+      return;
+    }
+    const permission = await requestNotificationPermission();
+    if (permission === "granted") {
+      updateSettings({ notifyEnabled: true });
+    } else if (permission === "unsupported") {
+      setNotifyError("Este navegador não suporta notificações.");
+    } else {
+      setNotifyError(
+        "Permissão de notificação negada. Libere nas configurações do navegador pra ativar."
+      );
+    }
   }
 
   return (
@@ -60,6 +84,32 @@ export default function Settings() {
             {saved ? "Salvo" : "Salvar"}
           </button>
         </form>
+      </div>
+
+      <div className="panel">
+        <h2>Alertas de ciclo</h2>
+        <label className="settings-toggle">
+          <input
+            type="checkbox"
+            checked={!!settings.soundEnabled}
+            onChange={(e) => updateSettings({ soundEnabled: e.target.checked })}
+          />
+          Tocar som quando um ciclo terminar
+        </label>
+        <label className="settings-toggle">
+          <input
+            type="checkbox"
+            checked={!!settings.notifyEnabled}
+            onChange={handleToggleNotify}
+            disabled={!notificationsSupported()}
+          />
+          Notificação do navegador quando um ciclo terminar
+        </label>
+        {notifyError && (
+          <p className="text-muted" style={{ fontSize: 12, marginTop: 6 }}>
+            {notifyError}
+          </p>
+        )}
       </div>
 
       <div className="panel">

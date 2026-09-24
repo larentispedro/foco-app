@@ -2,16 +2,25 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 import { useTimerEngine } from "../hooks/useTimerEngine";
 import { useDocumentPip } from "../hooks/useDocumentPip";
 import { usePomodoroSessions } from "../hooks/usePomodoroSessions";
+import { playChime } from "../lib/sound";
+import { notifyCycleEnd } from "../lib/notify";
 
 const SETTINGS_KEY = "foco:timer-settings";
 const TASK_KEY = "foco:timer-selected-task";
 
+const DEFAULT_SETTINGS = {
+  focusMinutes: 25,
+  breakMinutes: 5,
+  soundEnabled: true,
+  notifyEnabled: false,
+};
+
 function loadSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    return raw ? JSON.parse(raw) : { focusMinutes: 25, breakMinutes: 5 };
+    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
   } catch {
-    return { focusMinutes: 25, breakMinutes: 5 };
+    return DEFAULT_SETTINGS;
   }
 }
 
@@ -30,6 +39,10 @@ export function TimerProvider({ children }) {
     breakMinutes: settings.breakMinutes,
     onFocusComplete: (durationSeconds) => {
       logSession({ taskId: selectedTaskId || null, durationSeconds });
+    },
+    onCycleComplete: (_finishedMode, nextMode) => {
+      if (settings.soundEnabled) playChime();
+      if (settings.notifyEnabled) notifyCycleEnd(nextMode);
     },
   });
 

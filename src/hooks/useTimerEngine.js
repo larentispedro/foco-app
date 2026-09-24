@@ -32,7 +32,12 @@ function savePersisted(state) {
  *    reidratado (recalculando o restante contra o relógio atual) ao montar.
  *    Sem isso, um F5 no meio de um ciclo zera o progresso.
  */
-export function useTimerEngine({ focusMinutes, breakMinutes, onFocusComplete }) {
+export function useTimerEngine({
+  focusMinutes,
+  breakMinutes,
+  onFocusComplete,
+  onCycleComplete,
+}) {
   const initial = useRef(loadPersisted());
 
   const [mode, setMode] = useState(initial.current?.mode ?? "focus");
@@ -47,6 +52,8 @@ export function useTimerEngine({ focusMinutes, breakMinutes, onFocusComplete }) 
   const timeoutRef = useRef(null);
   const onFocusCompleteRef = useRef(onFocusComplete);
   onFocusCompleteRef.current = onFocusComplete;
+  const onCycleCompleteRef = useRef(onCycleComplete);
+  onCycleCompleteRef.current = onCycleComplete;
 
   const durationFor = useCallback(
     (m) => (m === "focus" ? focusMinutes : breakMinutes) * 60,
@@ -97,6 +104,7 @@ export function useTimerEngine({ focusMinutes, breakMinutes, onFocusComplete }) 
       if (finishedMode === "focus") {
         onFocusCompleteRef.current?.(durationFor("focus"));
       }
+      onCycleCompleteRef.current?.(finishedMode, nextMode);
       setMode(nextMode);
       setSecondsLeft(durationFor(nextMode));
       return;
